@@ -1,10 +1,8 @@
-/* 
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Other/javascript.js to edit this template
- */
-
-
-ase/analytics";
+import React, { createContext, useContext } from 'react';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
 
 // Replace with your Firebase configuration
 const firebaseConfig = {
@@ -17,12 +15,12 @@ const firebaseConfig = {
   measurementId: "G-X7B027WQL1"
 };
 
+// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
+const FirebaseContext = createContext(null);
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
-
-const FirebaseContext = createContext(null);
 
 export const FirebaseProvider = ({ children }) => (
   <FirebaseContext.Provider value={firebase}>{children}</FirebaseContext.Provider>

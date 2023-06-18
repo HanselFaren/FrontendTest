@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getStores, createStore } from '../api';
+import '../styles/Seller.css';
 
 const Seller = () => {
+  const navigate = useNavigate();
   const [stores, setStores] = useState([]);
   const [selectedStore, setSelectedStore] = useState('');
   const [storeName, setStoreName] = useState('');
@@ -9,17 +13,10 @@ const Seller = () => {
   useEffect(() => {
     const fetchStores = async () => {
       try {
-        // Replace the URL with your backend API endpoint for fetching existing stores
-        const response = await fetch('https://your-backend-api.com/api/stores');
-        const data = await response.json();
-
-        if (response.ok) {
-          setStores(data);
-        } else {
-          console.log('Failed to fetch stores.');
-        }
+        const storesData = await getStores();
+        setStores(storesData);
       } catch (error) {
-        console.log('Error fetching stores:', error);
+        console.log('Error fetching stores:', error.message);
       }
     };
 
@@ -28,38 +25,35 @@ const Seller = () => {
 
   const handleCreateStore = async () => {
     try {
-      // Replace the URL with your backend API endpoint for creating a store
-      const response = await fetch('https://your-backend-api.com/api/stores', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: storeName,
-          isPublic: isPublic,
-        }),
-      });
-
-      if (response.ok) {
-        console.log('Store created successfully!');
-        // Reset the input fields after successful store creation
-        setStoreName('');
-        setIsPublic(false);
-      } else {
-        console.log('Failed to create store.');
-      }
+      const newStore = {
+        name: storeName,
+        isPublic: isPublic,
+      };
+      const createdStore = await createStore(newStore);
+      console.log('Store created successfully!');
+      setStoreName('');
+      setIsPublic(false);
+      setSelectedStore(createdStore.id);
     } catch (error) {
-      console.log('Error creating store:', error);
+      console.log('Error creating store:', error.message);
     }
   };
 
+  const handleLogout = () => {
+    navigate('/');
+  };
+
   return (
-    <div>
-      <h2>Seller Page</h2>
-      <p>Welcome to the seller page!</p>
+    <div className="seller-container">
+      <h2 className="seller-heading">Seller</h2>
+      <button className="seller-button" onClick={handleLogout}>
+        Logout
+      </button>
       <h3>Create or Select Store:</h3>
-      <div>
-        <label htmlFor="createStore">Create New Store:</label>
+      <div className="seller-form">
+        <label className="seller-radio-label" htmlFor="createStore">
+          Create New Store:
+        </label>
         <input
           type="radio"
           id="createStore"
@@ -67,8 +61,10 @@ const Seller = () => {
           onChange={() => setSelectedStore('')}
         />
       </div>
-      <div>
-        <label htmlFor="selectStore">Select Existing Store:</label>
+      <div className="seller-form">
+        <label className="seller-radio-label" htmlFor="selectStore">
+          Select Existing Store:
+        </label>
         <input
           type="radio"
           id="selectStore"
@@ -77,13 +73,11 @@ const Seller = () => {
         />
       </div>
       {selectedStore ? (
-        <div>
+        <div className="seller-store">
           <p>Selected Store: {selectedStore}</p>
-          {/* Render the store details and items of the selected store */}
-          {/* ... */}
         </div>
       ) : (
-        <div>
+        <div className="seller-store">
           <h3>Create Store:</h3>
           <div>
             <label htmlFor="storeName">Store Name:</label>
@@ -103,7 +97,9 @@ const Seller = () => {
               onChange={(e) => setIsPublic(e.target.checked)}
             />
           </div>
-          <button onClick={handleCreateStore}>Create Store</button>
+          <button className="seller-button" onClick={handleCreateStore}>
+            Create Store
+          </button>
         </div>
       )}
     </div>
